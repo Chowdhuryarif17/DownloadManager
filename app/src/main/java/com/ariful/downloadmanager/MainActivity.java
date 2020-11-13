@@ -19,18 +19,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initialize_Views_With_XML();
+        initialize_Views_from_xml();
 
         dowloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
+
+                //progressBar.setVisibility(View.VISIBLE);
             }
         });
 
     }
-    private void initialize_Views_With_XML(){
-        urlEt = findViewById(R.id.urlEtId);
+    private void initialize_Views_from_xml(){
+        urlEt = findViewById(R.id.urlEditTextId);
         dowloadButton = findViewById(R.id.downloadUrlButtonId);
         progressBar = findViewById(R.id.progressBarId);
     }
