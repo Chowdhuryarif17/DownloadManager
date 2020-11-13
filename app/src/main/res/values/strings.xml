@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DownloadManager</string>
+    <string name="downloadUrlButton">Download</string>
+    <string name="hint">Enter url...</string>
 </resources>
