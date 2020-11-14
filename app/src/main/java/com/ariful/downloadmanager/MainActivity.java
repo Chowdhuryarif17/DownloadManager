@@ -17,14 +17,18 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_STORAGE_CODE = 1000;
 
-    DownloadManager manager;
+
     EditText urlEditText;
     Button dowloadButton;
     ProgressBar progressBar;
+    DownloadManager manager;
+//    String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +42,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //progressBar.setVisibility(View.VISIBLE);
 
-                //Runtime permission if OS is Marshmallow or above
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    //Runtime permission if OS is Marshmallow or above
                     if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                             PackageManager.PERMISSION_DENIED){
-                        //permission denied, request It
+
+                        //-----permission denied, request It-----
                         String [] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
                         //show pop up for runtime permission
                         requestPermissions(permissions , PERMISSION_STORAGE_CODE);
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                         startDownloading();
                     }
                 }
+
                 // OS is less than Marshmallow , perform download
                 else{
                     startDownloading();
@@ -65,9 +71,38 @@ public class MainActivity extends AppCompatActivity {
         dowloadButton = findViewById(R.id.downloadUrlButtonId);
         progressBar = findViewById(R.id.progressBarId);
     }
-    private void startDownloading(){
-        String url = urlEditText.getText().toString().trim();
 
+    // handle permission result
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case PERMISSION_STORAGE_CODE:{
+                if(grantResults.length > 0 && grantResults[0] ==
+                        PackageManager.PERMISSION_GRANTED){
+
+                    //---------------permission granted from pop up, perform download-----------
+
+                    //for OS is Android Q(android 10) or above
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                        //Toast.makeText(this, "Android 10 cann't download", Toast.LENGTH_SHORT).show();
+                        startDownloadingForAndroid10();
+                    }
+                    else{
+                        startDownloading(); //if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    }
+
+                }
+                else{
+                    //permission denied from popup, show error message
+                    Toast.makeText(this, "Permission denied!...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    private void startDownloading(){
+        // link set for download
+        String url = urlEditText.getText().toString().trim();
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         //allow types of network to download files
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
@@ -84,21 +119,10 @@ public class MainActivity extends AppCompatActivity {
         manager.enqueue(request);
     }
 
-    // handle permission result
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case PERMISSION_STORAGE_CODE:{
-                if(grantResults.length > 0 && grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED){
-                    //permission granted from pop up, perform download
-                    startDownloading();
-                }
-                else{
-                    //permission denied from popup, show error message
-                    Toast.makeText(this, "Permission denied!...", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
+    private void startDownloadingForAndroid10(){
+        // link set for download
+        String url = urlEditText.getText().toString().trim();
+
     }
+
 }
