@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_STORAGE_CODE = 1000;
 
+    DownloadManager manager;
     EditText urlEditText;
     Button dowloadButton;
     ProgressBar progressBar;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "" + System.currentTimeMillis()); //get current timestamp as file name
 
         //get download service and enque file
-        DownloadManager manager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+        manager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
     }
 
