@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DownloadManager</string>
+    <string name="app_name">IDM</string>
     <string name="downloadUrlButton">Download</string>
     <string name="hint">Enter url for download...</string>
 </resources>
