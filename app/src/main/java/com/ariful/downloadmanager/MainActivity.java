@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         dowloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //progressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
 
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                     //Runtime permission if OS is Marshmallow or above
@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
                     startDownloading();
                 }
             }
+
         });
 
     }
