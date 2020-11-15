@@ -5,12 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.app.DownloadManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
     EditText urlEditText;
     Button dowloadButton;
     ProgressBar progressBar;
-    DownloadManager manager;
-//    String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else{
                         //permission already granted , perform download
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                            Toast.makeText(MainActivity.this, "Android10 cann't download, need to check code", Toast.LENGTH_SHORT).show();
+
+                            startDownloadingForAndroid10();
+                        }
                         startDownloading();
                     }
                 }
@@ -84,13 +90,12 @@ public class MainActivity extends AppCompatActivity {
 
                     //for OS is Android Q(android 10) or above
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                        //Toast.makeText(this, "Android 10 cann't download", Toast.LENGTH_SHORT).show();
-                        startDownloadingForAndroid10();
+                        Toast.makeText(MainActivity.this, "Android10 cann't download, need to check code", Toast.LENGTH_LONG).show();
+                        startDownloadingForAndroid10(); // its not working :(
                     }
                     else{
                         startDownloading(); //if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                     }
-
                 }
                 else{
                     //permission denied from popup, show error message
@@ -101,8 +106,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startDownloading(){
-        // link set for download
+        //url link set for download
         String url = urlEditText.getText().toString().trim();
+
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         //allow types of network to download files
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
@@ -115,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "" + System.currentTimeMillis()); //get current timestamp as file name
 
         //get download service and enque file
-        manager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager manager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
     }
 
@@ -123,6 +129,22 @@ public class MainActivity extends AppCompatActivity {
         // link set for download
         String url = urlEditText.getText().toString().trim();
 
+        // You can add more columns.. Complete list of columns can be found at
+        // https://developer.android.com/reference/android/provider/MediaStore.Downloads
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.Downloads.TITLE, "NewVideo");
+        contentValues.put(MediaStore.Downloads.DISPLAY_NAME,"demoVideo");
+        contentValues.put(MediaStore.Downloads.MIME_TYPE, "mp4");
+        contentValues.put(MediaStore.Downloads.SIZE, "30MB");
+
+        // If you downloaded to a specific folder inside "Downloads" folder
+        contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + File.separator + "Temp");
+
+        // Insert into the database
+        ContentResolver database = getContentResolver();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            database.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
+        }
     }
 
 }
